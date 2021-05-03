@@ -1,0 +1,60 @@
+﻿@page "/order"
+@using BlazorShop.Data
+@using Microsoft.AspNetCore.Mvc.RazorPages
+@inject CartService _cartService
+@inject IJSRuntime _jsRuntime;
+
+<h3>Order</h3>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Name</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var product in _products)
+        {
+            <tr>
+                @product.Name
+                <td>
+                    <button @onclick="@(() => AddToCart(product))">Tilføj</button>
+                    <button @onclick="@(() => RemoveFromCart(product))">Fjern</button>
+                    <div>@GetAmount(product.Id)</div>
+                    <button @onclick="@ShowBuyMessage">Send</button>
+
+
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@code {
+    private List<Product> _products;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _products = _cartService.GetDistinctProducts();
+    }
+
+    public void RemoveFromCart(Product product)
+    {
+        _cartService.RemoveProduct(product);
+    }
+
+    public void AddToCart(Product product)
+    {
+        _cartService.AddProduct(product);
+    }
+
+    public int GetAmount(int id)
+    {
+        return _cartService.GetNumberOfProducts(id);
+    }
+
+    public async Task ShowBuyMessage()
+    {
+        await _jsRuntime.InvokeAsync<object>("alert", "Tak for købet");
+    }
+}

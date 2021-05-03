@@ -1,0 +1,48 @@
+﻿@page "/cart"
+@using BlazorShop.Data
+@using Microsoft.AspNetCore.Mvc.RazorPages
+@inject CartService _cartService
+<h3>Cart</h3>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Name</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var product in _products)
+        {
+            <tr>
+                @product.Name
+                <td>
+                    <button @onclick="@(() => RemoveFromCart(product))">Fjern fra kurv</button>
+                    <div>@GetAmount(product.Id)</div>
+                    <NavLink href=@{ "/order"}>
+                        <button>Bestil</button>
+                    </NavLink>
+
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@code {
+    private List<Product> _products;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _products = _cartService.GetDistinctProducts();
+    }
+
+    public void RemoveFromCart(Product product)
+    {
+        _cartService.RemoveProduct(product);
+    }
+
+    public int GetAmount(int id)
+    {
+        return _cartService.GetNumberOfProducts(id);
+    }
+}

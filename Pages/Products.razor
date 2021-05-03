@@ -1,0 +1,69 @@
+﻿@page "/product/{Category}"
+@using BlazorShop.Data
+@using System.ComponentModel
+@inject IProductService _productService
+@inject CartService _cartService
+
+<div>
+    @if (Collapsed)
+    {
+        <span @onclick="@Toggle" class="oi oi-plus mr-1"></span>
+    }
+    else
+    {
+        <span @onclick="@Toggle" class="oi oi-minus mr-1"></span>
+    }
+    @Category
+</div>
+@if (!Collapsed)
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Color</th>
+                <th>Name</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var product in _products)
+            {
+                <tr>
+                    <td>
+                        @product.Color
+                    </td>
+                    <NavLink href=@{"/product/details/" + product.Id}>
+                        @product.Name
+                    </NavLink>
+                    <td>
+                        <button @onclick="@(() => AddToCart(product))">Læg i Kurv</button>
+                        <div>Antal</div>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+
+@code {
+    private List<Product> _products;
+    [Parameter]
+    public string Category { get; set; }
+    [Parameter]
+    public bool Collapsed { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        _products = await _productService.GetProductsAsync(Category);
+    }
+
+    private void Toggle()
+    {
+        Collapsed = !Collapsed;
+    }
+
+    private void AddToCart(Product product)
+    {
+        _cartService.AddProduct(product);
+    }
+}

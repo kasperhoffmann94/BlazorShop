@@ -1,0 +1,23 @@
+﻿@page "/category"
+@using BlazorShop.Data
+@using Microsoft.AspNetCore.Mvc.RazorPages
+@inject IProductService _productService
+<h3>Categories</h3>
+<ul>
+    @foreach (var category in _categories)
+    {
+        <li>
+            <Products Category=@category Collapsed=@true />
+        </li>
+    }
+</ul>
+
+
+@code {
+    private HashSet<string> _categories;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _categories = await _productService.GetCategoriesAsync();
+    }
+}
